@@ -1,0 +1,1807 @@
+[
+    {
+        "id": "35ad4fe4.069a3",
+        "type": "subflow",
+        "name": "SaveChart",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "f4457c36.28ce1"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 820,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "cf553dbd.50f9a",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "db9cbd5c.fb547",
+        "type": "file",
+        "z": "35ad4fe4.069a3",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "x": 690,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f7f46486.9881a8",
+        "type": "file in",
+        "z": "35ad4fe4.069a3",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "sendError": true,
+        "allProps": false,
+        "x": 530,
+        "y": 80,
+        "wires": [
+            [
+                "cf553dbd.50f9a"
+            ]
+        ]
+    },
+    {
+        "id": "ac2168dc.ee28f8",
+        "type": "json",
+        "z": "35ad4fe4.069a3",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 40,
+        "wires": [
+            [
+                "db9cbd5c.fb547"
+            ]
+        ]
+    },
+    {
+        "id": "cf553dbd.50f9a",
+        "type": "json",
+        "z": "35ad4fe4.069a3",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 690,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f4457c36.28ce1",
+        "type": "function",
+        "z": "35ad4fe4.069a3",
+        "name": "LoadSave",
+        "func": "var strSafe=msg.topic;\nif(strSafe)\n{\n    strSafe=strSafe.replace(/[^a-z0-9]/gi, '_').toLowerCase();\n    var loaded=context.get(strSafe)||0;\n    msg.filename =\"/home/pi/charts/\"+strSafe+\".dat\";\n    //node.warn(loaded);\n    if(0===loaded)\n    {\n        //load chart!! \n        msg.payload=\"load\";\n        context.set(strSafe,1);\n        \n        //node.warn(\"Loading \" +strSafe);\n    }\n    else\n    {\n        //node.warn(\"Writing \" +strSafe);\n    }\n    return msg;    \n}\nreturn null;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 230,
+        "y": 60,
+        "wires": [
+            [
+                "99a5d40b.95d618"
+            ]
+        ]
+    },
+    {
+        "id": "99a5d40b.95d618",
+        "type": "switch",
+        "z": "35ad4fe4.069a3",
+        "name": "Load data",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "load",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "load",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 380,
+        "y": 60,
+        "wires": [
+            [
+                "ac2168dc.ee28f8"
+            ],
+            [
+                "f7f46486.9881a8"
+            ]
+        ]
+    },
+    {
+        "id": "583634d236bcd70f",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6db8d4ca34d9c26f",
+        "type": "mqtt in",
+        "z": "583634d236bcd70f",
+        "name": "User_1",
+        "topic": "#",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4bf6854a2dd377cc",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "98b857bc72c01b16"
+            ]
+        ]
+    },
+    {
+        "id": "a488bad96f8efaaa",
+        "type": "mongodb-aleph-out",
+        "z": "583634d236bcd70f",
+        "mongodb": "82f5d1d2dffa9989",
+        "name": "",
+        "collection": "Valorant",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 1320,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a1230895adeaadc1",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Adquirir_HR",
+        "func": "\nvar date;\n\ndate = new Date();\ndate = (date.getFullYear() + '-' + ('00' + (date.getMonth()+1)).slice(-2) + '-' + ('00' + date.getDate()).slice(-2) + ' ' + ('00' + date.getHours()).slice(-2) + ':' + ('00' + date.getMinutes()).slice(-2) + ':' + ('00' + date.getSeconds()).slice(-2));\nif( msg.topic== \"HR\") {\n    \nvar newMsg = msg;\nnewMsg.payload = newMsg.payload.replace ('\\n', '');\nnewMsg.payload = {Time: date, Heart_Rate: newMsg.payload}\nreturn newMsg;\n    \n}\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 160,
+        "wires": [
+            [
+                "5c19d34bc048b40c"
+            ]
+        ]
+    },
+    {
+        "id": "a036c01955e85dc8",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Envio_Alertas",
+        "func": "var valor_Heart_Rate = msg.payload.Biometric_Data.HR.Heart_Rate;\nvar age = msg.payload.Biometric_Data.User_Details.Age;\nvar velocity = msg.payload.Calculation_Velocity.Average_Velocity;\nvar MAX_HR_Activity = parseFloat(((220 - age) * 0.76)).toFixed(1);\nvar average_HR = msg.payload.Average_HR.Average;\nvar alerta_elevado=context.get(\"alerta_elevado\");\nvar alerta_baixo=context.get(\"alerta_baixo\");\nvar alerta_zero=context.get(\"alerta_zero\");\nvar alerta_aritmia=context.get(\"alerta_aritmia\");\nvar em_Atividade=context.get(\"em_Atividade\");\nvar alerta_aumento_diminuio=context.get(\"alerta_aumento_diminuio\");\nvar alerta_em_atividade=context.get(\"alerta_em_atividade\");\n\n\n\nif(typeof alerta_elevado==\"undefined\" ){\n    alerta_elevado=false;\n}\n    \nif(typeof alerta_baixo==\"undefined\" ){\n    alerta_baixo=false;\n}\n\nif(typeof alerta_aritmia==\"undefined\" ){\n    alerta_aritmia=false;\n}\n\nif(typeof alerta_zero==\"undefined\" ){\n    alerta_zero=false;\n}\n\nif(typeof em_Atividade==\"undefined\" ){\n    em_Atividade=false;\n}\n\nif(typeof alerta_em_atividade==\"undefined\" ){\n    alerta_em_atividade=false;\n}\n\nif(typeof alerta_aumento_diminuio==\"undefined\" ){\n   alerta_aumento_diminuio=false;\n}\n\n    \n  \n\nif(  JSON.parse(age) > \"10\" && (JSON.parse(valor_Heart_Rate) > \"95\" && JSON.parse(valor_Heart_Rate) < \"100\") && !alerta_elevado ){\n    if(JSON.parse(velocity) > \"1.0\" && !em_Atividade && JSON.parse(valor_Heart_Rate) <= MAX_HR_Activity  ) { \n        em_Atividade=true;\n        msg.alarm = 5;\n        context.set(\"em_Atividade\",em_Atividade );\n        msg.payload= valor_Heart_Rate;\n        return msg;\n    }\n\n    else if (JSON.parse(velocity) <= \"1.0\" && em_Atividade  ){\n            em_Atividade=false;\n            alerta_elevado=true;\n            msg.alarm = 1;\n            context.set(\"em_Atividade\",em_Atividade);\n            context.set(\"alerta_elevado\",alerta_elevado);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n    }\n    \n}\n\nif(JSON.parse(age) > \"10\" && (JSON.parse(valor_Heart_Rate) > \"95\" && JSON.parse(valor_Heart_Rate) < \"100\") && JSON.parse(velocity) <= \"1.0\" && !alerta_elevado ){\n            alerta_elevado=true;\n            msg.alarm = 1;\n            context.set(\"alerta_elevado\",alerta_elevado);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n}\n    \n \nif(JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) < \"95\" && alerta_elevado ){\n    alerta_elevado=false;\n    msg.alarm = 0;\n    context.set(\"alerta_elevado\",alerta_elevado);\n    msg.payload =  valor_Heart_Rate; \n    return msg;\n}\n\n\nif(JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) < \"55\" && alerta_baixo ){\n    alerta_baixo=false;\n    msg.alarm = 2;\n    context.set(\"alerta_baixo\",alerta_baixo);\n    msg.payload =  valor_Heart_Rate; \n    return msg;\n}\n\nif(  JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) > \"55\" && !alerta_baixo ){\n    alerta_baixo=true;\n    msg.alarm = 3;\n    context.set(\"alerta_baixo\",alerta_baixo);\n    msg.payload= valor_Heart_Rate;\n    return msg;\n}\n\nif( JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) > \"100\"  && !alerta_aritmia ){\n   if(JSON.parse(velocity) > \"1.0\" && !em_Atividade && JSON.parse(valor_Heart_Rate) <= MAX_HR_Activity ) {\n        em_Atividade=true;\n        msg.alarm = 5;\n        context.set(\"em_Atividade\",em_Atividade);\n        msg.payload= valor_Heart_Rate;\n        return msg;\n    }\n    else if (JSON.parse(velocity) <= \"1.0\" && em_Atividade ){\n            em_Atividade=false;\n            alerta_aritmia=true;\n            msg.alarm = 6;\n            context.set(\"em_Atividade\",em_Atividade);\n            context.set(\"alerta_aritmia\",alerta_aritmia);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n    }\n    \n}\n\nif( JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) > \"100\"  && JSON.parse(velocity) <= \"1.0\" && !alerta_aritmia ){\n            \n            alerta_aritmia=true;\n            msg.alarm = 6;\n            context.set(\"alerta_aritmia\",alerta_aritmia);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n}\n\n\nif(JSON.parse(age) > \"10\" && JSON.parse(valor_Heart_Rate) < \"50\" && alerta_aritmia ){\n    alerta_aritmia=false;\n    msg.alarm = 7;\n    context.set(\"alerta_aritmia\",alerta_aritmia);\n    msg.payload =  valor_Heart_Rate; \n    return msg;\n}\n\nif(JSON.parse(valor_Heart_Rate) == \"0\" && !alerta_zero ){\n    alerta_zero=true;\n    msg.alarm = 4;\n    context.set(\"alerta_zero\",alerta_zero);\n    msg.payload= valor_Heart_Rate;\n    return msg;\n}\n\nif(JSON.parse(valor_Heart_Rate) != \"0\" && alerta_zero ){\n    alerta_zero=false;\n    context.set(\"alerta_zero\",alerta_zero);\n   \n}\n\n\nif( JSON.parse(velocity) > \"1.0\" && JSON.parse(valor_Heart_Rate) > MAX_HR_Activity && !alerta_em_atividade ){\n            alerta_em_atividade=true;\n            msg.alarm = 8;\n            context.set(\"alerta_em_atividade\",alerta_em_atividade);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n}\n\nif( JSON.parse(velocity) > \"1.0\" && JSON.parse(valor_Heart_Rate) <= MAX_HR_Activity && alerta_em_atividade ){\n            alerta_em_atividade=false;\n            msg.alarm = 5;\n            context.set(\"alerta_em_atividade\",alerta_em_atividade);\n            msg.payload= valor_Heart_Rate;\n            return msg;\n}\n\n   \n  if(JSON.parse(average_HR) > \"2.5\" && JSON.parse(velocity) <= \"1.0\" && !alerta_aumento_diminuio ) { \n        alerta_aumento_diminuio=true;\n        msg.alarm =9;\n        context.set(\"alerta_aumento_diminuio\",alerta_aumento_diminuio);\n        msg.payload= valor_Heart_Rate;\n        return msg;\n    }\n    \n     if(JSON.parse(average_HR) <= \"2.5\" && JSON.parse(velocity) <= \"1.0\" && JSON.parse(valor_Heart_Rate) < \"95\" && alerta_aumento_diminuio ) { \n        alerta_aumento_diminuio=false;\n        msg.alarm = 0;\n        context.set(\"alerta_aumento_diminuio\",alerta_aumento_diminuio);\n        msg.payload= valor_Heart_Rate;\n        return msg;\n       \n       \n    }\n\n    \n   \n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1620,
+        "y": 280,
+        "wires": [
+            [
+                "903df4e6f15b2c77",
+                "a9e7db5677175611",
+                "8ce764ca48d50739"
+            ]
+        ]
+    },
+    {
+        "id": "903df4e6f15b2c77",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Informacao_para_email",
+        "func": "var valor_HR=msg.payload;\nmsg.to=\"tiago.caixeirops3@gmail.com\";\nmsg.from=\"tiago.caixeiro@hotmail.com\";\n\nvar d =new Date();\n\nvar message=\"\";\n\nif (msg.alarm == \"1\"){\n    msg.topic=\"Heart Rate Alerta\";\n    message=\" Valor de Heart Rate bastante elevado, Heart_Rate= \";    \n}\n\nif (msg.alarm == \"0\" || msg.alarm ==\"3\"){\n    msg.topic=\"Heart Rate Controlado\";\n    message=\" Valor de Heart Rate equilibrado, Heart_Rate= \";  \n    \n}\n\nif ( msg.alarm == \"2\"){\n    msg.topic=\"Heart Rate Alerta\";\n    message=\" Valor de Heart Rate bastante baixo, Heart_Rate= \";    \n}\n\n\nif (msg.alarm == \"4\"){\n    msg.topic=\"Heart Rate Nulo\";\n    message=\" Valor de Heart Rate Nulo, Heart_Rate= \"; \n}\n\nif (msg.alarm == \"6\"){\n    msg.topic=\"Heart Rate elevado\";\n    message=\" Heart Rate elevado, possivel taquicardia, Heart_Rate= \"; \n}\n\nif (msg.alarm ==\"7\"){\n    msg.topic=\"Heart Rate baixo\";\n    message=\" Valor de Heart Rate baixo, possivel bradicardia, Heart_Rate=  \"; \n}\n\nif (msg.alarm == \"5\"){\n    msg.topic=\"Atividade fisica \";\n    message=\"Encontra-se a realizar atividade fisica, Heart_Rate=  \"; \n}\n\nif (msg.alarm == \"8\"){\n    msg.topic=\"Alerta Atividade fisica Heart Rate elevado \";\n    message=\" Valor de Heart Rate elevado, apesar de se encontrar a realizar atividade fisica, Heart_Rate=  \"; \n}\n\n\nif (msg.alarm == \"9\"){\n    msg.topic=\"Alerta Variacao de Heart Rate \";\n    message=\"Variacao de Heart Rate bastante rapida, Heart_Rate=  \"; \n}\n\n\n\nmsg.payload=\"time:\"+ d + message + valor_HR;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1850,
+        "y": 280,
+        "wires": [
+            [
+                "b38ccbc3f208a899"
+            ]
+        ]
+    },
+    {
+        "id": "5c19d34bc048b40c",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Medicao_HR",
+        "func": "var valor_Heart_Rate = msg.payload.Heart_Rate;\n\nif(JSON.parse(valor_Heart_Rate) >= \"0\" ){\n  msg.payload = { Time: msg.payload.Time, Value_Type: \"Heart_Rate Measure\", Heart_Rate: valor_Heart_Rate} \n   return msg; \n}\n\n\n\n\n\n\n\n\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 180,
+        "wires": [
+            [
+                "ed148e5006acae10"
+            ]
+        ]
+    },
+    {
+        "id": "98b857bc72c01b16",
+        "type": "switch",
+        "z": "583634d236bcd70f",
+        "name": "Adquirir_dados_biometricos",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "User_Details",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "HR",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Steps",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Fat_burned",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Calories",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Distance",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 6,
+        "x": 240,
+        "y": 180,
+        "wires": [
+            [
+                "d95417f5403264a9"
+            ],
+            [
+                "a1230895adeaadc1",
+                "eb84c963eee495e3",
+                "6aaf5d826cc8e766"
+            ],
+            [
+                "78a7ea1be5b3323a",
+                "25af01c5fce81b0a"
+            ],
+            [
+                "78a7ea1be5b3323a",
+                "4779df93ba345d21"
+            ],
+            [
+                "78a7ea1be5b3323a",
+                "e00baa32fefa3dfc"
+            ],
+            [
+                "78a7ea1be5b3323a",
+                "b27ccd085f7d2c21"
+            ]
+        ]
+    },
+    {
+        "id": "78a7ea1be5b3323a",
+        "type": "join",
+        "z": "583634d236bcd70f",
+        "name": "Activity",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "1",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 460,
+        "y": 220,
+        "wires": [
+            [
+                "9cf0b3d304fe7707"
+            ]
+        ]
+    },
+    {
+        "id": "e9e73c48488456b3",
+        "type": "debug",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1890,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "9cf0b3d304fe7707",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Adquirir_steps_calories_fat_distance",
+        "func": "msg.topic = \"Activity\";\nvar date;\nvar date_after;\n\ndate = new Date();\ndate = (('00' + date.getHours()).slice(-2) + ':' + ('00' + date.getMinutes()).slice(-2) + ':' + ('00' + date.getSeconds()).slice(-2));\n\n\n\n\nmsg.payload = {Time: date, Activity: msg.payload } ;\nreturn msg;\n \n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 220,
+        "wires": [
+            [
+                "ed148e5006acae10",
+                "c9a412e424292254",
+                "dcd2800dc7c999f2",
+                "79c6539b1e4e6d52"
+            ]
+        ]
+    },
+    {
+        "id": "ed148e5006acae10",
+        "type": "join",
+        "z": "583634d236bcd70f",
+        "name": "DADOS",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": true,
+        "timeout": "0",
+        "count": "3",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 740,
+        "y": 120,
+        "wires": [
+            [
+                "809f4f0aa20d81f9",
+                "e0464404e6547942"
+            ]
+        ]
+    },
+    {
+        "id": "d95417f5403264a9",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Adquirir_User_Details",
+        "func": "\nvar age = \"24\";\n\nif( msg.topic == \"User_Details\" ) {\n    msg.payload = {User: msg.payload , Age: age};\n}\n\nreturn msg;\n   \n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 120,
+        "wires": [
+            [
+                "ed148e5006acae10",
+                "286e53feb8c2c62c"
+            ]
+        ]
+    },
+    {
+        "id": "b38ccbc3f208a899",
+        "type": "e-mail",
+        "z": "583634d236bcd70f",
+        "server": "smtp-mail.outlook.com",
+        "port": "587",
+        "secure": false,
+        "tls": true,
+        "name": "tiago.caixeirops3@gmail.com",
+        "dname": "Email",
+        "x": 2030,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "4779df93ba345d21",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "3d7aea3d75251625",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "name": "Fat_Burned",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "className": "",
+        "x": 470,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "b27ccd085f7d2c21",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "5da384986f9b6bcd",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "Distance",
+        "label": "",
+        "format": "{{msg.payload + \" Meters\"}}",
+        "layout": "col-center",
+        "className": "",
+        "x": 460,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "3e55ddbfff1b5658",
+        "type": "inject",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "MinLimit",
+        "payload": "55",
+        "payloadType": "str",
+        "x": 250,
+        "y": 340,
+        "wires": [
+            [
+                "eb84c963eee495e3"
+            ]
+        ]
+    },
+    {
+        "id": "eb84c963eee495e3",
+        "type": "ui_chart",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "group": "7e68e2e4e786f50f",
+        "order": 1,
+        "width": 10,
+        "height": 7,
+        "label": "Aquired Values",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#ff0000",
+            "#ff0000",
+            "#000000",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 480,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e00baa32fefa3dfc",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "ae48ff1fefa62809",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "name": "Calories",
+        "label": "",
+        "format": "{{msg.payload + \" Kcal\"}}",
+        "layout": "col-center",
+        "className": "",
+        "x": 460,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "b378ff8376ab24f9",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "d7f40dd86bc922f2",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Alertas",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 1860,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "a9e7db5677175611",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Alertas_Dashboard",
+        "func": "var valor_HR=msg.payload;\n\nif (msg.alarm == \"1\"){\n    msg.topic=\"Heart Rate Alerta\";\n    msg.payload=\" Valor de Heart Rate bastante elevado, Heart_Rate= \" + valor_HR;    \n}\n\nif (msg.alarm ==\"0\" || msg.alarm ==\"3\"){\n    msg.topic=\"Heart Rate Controlado\";\n   msg.payload=\" Valor de Heart Rate equilibrado, Heart_Rate= \" + valor_HR;  \n    \n}\n\nif ( msg.alarm == \"2\"){\n    msg.topic=\"Heart Rate Alerta\";\n    msg.payload=\" Valor de Heart Rate bastante baixo, Heart_Rate= \" + valor_HR;    \n}\n\n\nif (msg.alarm == \"4\"){\n    msg.topic=\"Heart Rate Nulo\";\n    msg.payload=\" Valor de Heart Rate Nulo, Heart_Rate= \" + valor_HR; \n}\n\nif (msg.alarm ==\"6\"){\n    msg.topic=\"Heart Rate elevado\";\n    msg.payload=\"  Heart Rate elevado, possivel taquicardia, Heart_Rate= \" + valor_HR; \n}\n\nif (msg.alarm ==\"7\"){\n    msg.topic=\"Heart Rate baixo\";\n    msg.payload=\"  Heart Rate baixo, possivel bradicardia, Heart_Rate=  \" + valor_HR; \n}\n\nif (msg.alarm == \"5\"){\n    msg.topic=\"Atividade fisica \";\n    msg.payload=\" Encontra-se a realizar atividade fisica, Heart_Rate=  \" + valor_HR; \n}\n\nif (msg.alarm == \"8\"){\n    msg.topic=\"Alerta Atividade fisica Heart Rate elevado \";\n    msg.payload=\" Valor de Heart Rate elevado, apesar de se encontrar a realizar atividade fisica, Heart_Rate=  \" + valor_HR; \n}\n\n\nif (msg.alarm == \"9\"){\n    msg.topic=\"Alerta Variacao de Heart Rate \";\n    msg.payload=\"Variacao de Heart Rate bastante rapida, Heart_Rate=  \" + valor_HR; \n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1670,
+        "y": 360,
+        "wires": [
+            [
+                "b378ff8376ab24f9",
+                "e9e73c48488456b3",
+                "ee27c78bf4b2647a",
+                "4b388e52ecf36ccb"
+            ]
+        ]
+    },
+    {
+        "id": "132cf359dd021701",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "05fc8dde70e5789c",
+        "order": 1,
+        "width": 9,
+        "height": 3,
+        "name": "User",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 930,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "286e53feb8c2c62c",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "User_Details_Dashboard",
+        "func": "msg.payload= \"User\" + \"<br>\" + msg.payload.User + \"<br>\" + \"<br>\" + \"Age \" + \"<br>\" + msg.payload.Age ;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 40,
+        "wires": [
+            [
+                "132cf359dd021701"
+            ]
+        ]
+    },
+    {
+        "id": "fcdde7eb7ed75a92",
+        "type": "inject",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "Max Limit",
+        "payload": "95",
+        "payloadType": "str",
+        "x": 260,
+        "y": 280,
+        "wires": [
+            [
+                "eb84c963eee495e3"
+            ]
+        ]
+    },
+    {
+        "id": "6aaf5d826cc8e766",
+        "type": "ui_gauge",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "group": "7e68e2e4e786f50f",
+        "order": 2,
+        "width": 10,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Current Value",
+        "label": "BPM",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "160",
+        "colors": [
+            "#ff0000",
+            "#44ff00",
+            "#ca3838"
+        ],
+        "seg1": "55",
+        "seg2": "95",
+        "className": "",
+        "x": 480,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "25af01c5fce81b0a",
+        "type": "ui_text",
+        "z": "583634d236bcd70f",
+        "group": "01c929cb9bae062b",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "name": "Steps",
+        "label": "Today Steps",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 450,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "c9a412e424292254",
+        "type": "join",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "1",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1030,
+        "y": 280,
+        "wires": [
+            [
+                "f799e4b0b730fdb8"
+            ]
+        ]
+    },
+    {
+        "id": "753dc2f7c91e0548",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1040,
+        "y": 360,
+        "wires": [
+            [
+                "2731189a3d21eed8"
+            ]
+        ]
+    },
+    {
+        "id": "f799e4b0b730fdb8",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Calcular_Velocidade",
+        "func": "msg.topic = \"Calculation_Velocity\";\nvar cal_distance;\nvar cal_time;\nvar Av_Velocity;\n\nif( msg.payload.Before_time.Time !=null && msg.payload.Actual_Time.Time != null){\n\n\nmsg.payload.Actual_Time.Time = msg.payload.Actual_Time.Time.replace(':', '');\nmsg.payload.Actual_Time.Time = msg.payload.Actual_Time.Time.replace(':', '');\n\nmsg.payload.Before_time.Time =  msg.payload.Before_time.Time.replace(':', '');\nmsg.payload.Before_time.Time =  msg.payload.Before_time.Time.replace(':', '');\n\ncal_time = msg.payload.Actual_Time.Time - msg.payload.Before_time.Time;\ncal_distance = (msg.payload.Activity.Activity.Steps - msg.payload.Before_time.Activity.Steps) * 0.82;\n\n    if( cal_time <= 20) {\n    \n        Av_Velocity = parseFloat(cal_distance/cal_time).toFixed(1);\n        msg.payload = { Calculo_Time: cal_time, Calculo_Distance: cal_distance, Average_Velocity: Av_Velocity} ;\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 280,
+        "wires": [
+            [
+                "495116437868ea23",
+                "802a061c970b543d",
+                "6782d98657cc6964"
+            ]
+        ]
+    },
+    {
+        "id": "802a061c970b543d",
+        "type": "debug",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "495116437868ea23",
+        "type": "join",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "3",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1450,
+        "y": 280,
+        "wires": [
+            [
+                "a036c01955e85dc8"
+            ]
+        ]
+    },
+    {
+        "id": "dcd2800dc7c999f2",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Create_Steps_history",
+        "func": "var Steps_History = [] ; \nvar newMsg = msg;\n\nif (Steps_History.length === 6 ) {\n    Steps_History.shift();\n}\n\n\n\nSteps_History.push(msg.payload.Activity.Steps)\nnewMsg.payload = Steps_History ;\n   \nnewMsg.arraylength = Steps_History.length;\nreturn newMsg;\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 320,
+        "wires": [
+            [
+                "ec51b281681ce57a"
+            ]
+        ]
+    },
+    {
+        "id": "feb8d31b39de452f",
+        "type": "debug",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "ec51b281681ce57a",
+        "type": "bar-chart-data",
+        "z": "583634d236bcd70f",
+        "name": "Steps_History",
+        "x_interval": "days",
+        "x_size": "5",
+        "unit": "Steps",
+        "precision": "0",
+        "is_meter_reading": "False",
+        "agg_by": "max",
+        "x": 1040,
+        "y": 420,
+        "wires": [
+            [
+                "0a8234eff9bf14ac",
+                "256357931184289d"
+            ]
+        ]
+    },
+    {
+        "id": "0a8234eff9bf14ac",
+        "type": "ui_chart",
+        "z": "583634d236bcd70f",
+        "name": "Steps",
+        "group": "01c929cb9bae062b",
+        "order": 3,
+        "width": 8,
+        "height": 7,
+        "label": "Steps History per Day",
+        "chartType": "bar",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1230,
+        "y": 420,
+        "wires": [
+            [
+                "e5fac2ddbec06ffc"
+            ]
+        ]
+    },
+    {
+        "id": "6782d98657cc6964",
+        "type": "ui_gauge",
+        "z": "583634d236bcd70f",
+        "name": "Velocidade",
+        "group": "63183f11e233fce2",
+        "order": 1,
+        "width": 9,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Current Value",
+        "label": "m/s",
+        "format": "{{msg.payload.Average_Velocity}}",
+        "min": "0",
+        "max": "30",
+        "colors": [
+            "#00ff11",
+            "#44ff00",
+            "#3acb52"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1450,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "60013f0770b46922",
+        "type": "persist out",
+        "z": "583634d236bcd70f",
+        "name": "stores",
+        "storageNode": "9948bbaa5cdd5ae2",
+        "x": 890,
+        "y": 480,
+        "wires": [
+            [
+                "feb8d31b39de452f",
+                "ec51b281681ce57a"
+            ]
+        ]
+    },
+    {
+        "id": "256357931184289d",
+        "type": "persist in",
+        "z": "583634d236bcd70f",
+        "name": "stores",
+        "storageNode": "9948bbaa5cdd5ae2",
+        "x": 1210,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "e5fac2ddbec06ffc",
+        "type": "subflow:35ad4fe4.069a3",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "x": 1410,
+        "y": 420,
+        "wires": [
+            [
+                "0a8234eff9bf14ac"
+            ]
+        ]
+    },
+    {
+        "id": "8ce764ca48d50739",
+        "type": "debug",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1790,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "e0464404e6547942",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "HR_TO_AVERAGE",
+        "func": "msg.payload = msg.payload.HR.Heart_Rate;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 100,
+        "wires": [
+            [
+                "3e6f7e1141c2dd42",
+                "100955515cba6e33",
+                "366bcab859512d89",
+                "0da6676cfada0457",
+                "0b453311990b67cb"
+            ]
+        ]
+    },
+    {
+        "id": "3e6f7e1141c2dd42",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "Hr1",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1250,
+        "y": 20,
+        "wires": [
+            [
+                "9cb8fd00b8dd323d"
+            ]
+        ]
+    },
+    {
+        "id": "100955515cba6e33",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "Hr2",
+        "pauseType": "delay",
+        "timeout": "2",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1250,
+        "y": 60,
+        "wires": [
+            [
+                "208a360b37ef9934"
+            ]
+        ]
+    },
+    {
+        "id": "366bcab859512d89",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "Hr3",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1250,
+        "y": 100,
+        "wires": [
+            [
+                "da6b10f4216c98d9"
+            ]
+        ]
+    },
+    {
+        "id": "0da6676cfada0457",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "Hr4",
+        "pauseType": "delay",
+        "timeout": "4",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1250,
+        "y": 140,
+        "wires": [
+            [
+                "d87118592631a468"
+            ]
+        ]
+    },
+    {
+        "id": "0b453311990b67cb",
+        "type": "delay",
+        "z": "583634d236bcd70f",
+        "name": "Hr5",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1250,
+        "y": 180,
+        "wires": [
+            [
+                "648f37d32ec43f3a"
+            ]
+        ]
+    },
+    {
+        "id": "1278e1cbd2fbf734",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Average_HR",
+        "func": "msg.topic= \"Average_HR\";\nvar HR1 = msg.payload.HR1;\nvar HR2 = msg.payload.HR2;\nvar HR3 = msg.payload.HR3;\nvar HR4 = msg.payload.HR4;\nvar HR5 = msg.payload.HR5;\n\nvar diff1 = Math.abs(HR2-HR1);\nvar diff2 = Math.abs(HR3-HR2);\nvar diff3 = Math.abs(HR3-HR2);\nvar diff4 = Math.abs(HR4-HR3);\n\nvar average = (diff1+diff2+diff3+diff4)/4;\nvar abs_average = Math.abs(average);\n\nmsg.payload = { Diff1: diff1, Diff2:diff2, Diff3:diff3, Diff4:diff4, Average: abs_average};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1750,
+        "y": 100,
+        "wires": [
+            [
+                "495116437868ea23"
+            ]
+        ]
+    },
+    {
+        "id": "ea904b9035a2a7f6",
+        "type": "join",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "5",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1610,
+        "y": 100,
+        "wires": [
+            [
+                "1278e1cbd2fbf734"
+            ]
+        ]
+    },
+    {
+        "id": "9cb8fd00b8dd323d",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "HR1",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1410,
+        "y": 20,
+        "wires": [
+            [
+                "ea904b9035a2a7f6"
+            ]
+        ]
+    },
+    {
+        "id": "208a360b37ef9934",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "HR2",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1410,
+        "y": 60,
+        "wires": [
+            [
+                "ea904b9035a2a7f6"
+            ]
+        ]
+    },
+    {
+        "id": "da6b10f4216c98d9",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "HR3",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1410,
+        "y": 100,
+        "wires": [
+            [
+                "ea904b9035a2a7f6"
+            ]
+        ]
+    },
+    {
+        "id": "d87118592631a468",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "HR4",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1410,
+        "y": 140,
+        "wires": [
+            [
+                "ea904b9035a2a7f6"
+            ]
+        ]
+    },
+    {
+        "id": "648f37d32ec43f3a",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "HR5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1410,
+        "y": 180,
+        "wires": [
+            [
+                "ea904b9035a2a7f6"
+            ]
+        ]
+    },
+    {
+        "id": "809f4f0aa20d81f9",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "Biometric_Data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Biometric_Data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 220,
+        "wires": [
+            [
+                "a488bad96f8efaaa",
+                "495116437868ea23"
+            ]
+        ]
+    },
+    {
+        "id": "79c6539b1e4e6d52",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "Get_Time_Activity",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Actual_Time",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 790,
+        "y": 280,
+        "wires": [
+            [
+                "c9a412e424292254",
+                "753dc2f7c91e0548"
+            ]
+        ]
+    },
+    {
+        "id": "2731189a3d21eed8",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "Before_time",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Before_time",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1190,
+        "y": 360,
+        "wires": [
+            [
+                "c9a412e424292254"
+            ]
+        ]
+    },
+    {
+        "id": "ee0a7b3a0171df0d",
+        "type": "ui_table",
+        "z": "583634d236bcd70f",
+        "group": "26b577844dcaa05e",
+        "name": "Save_Alerts",
+        "order": 1,
+        "width": 30,
+        "height": 12,
+        "columns": [],
+        "outputs": 1,
+        "cts": true,
+        "x": 2030,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ff53fba910e3bf30",
+        "type": "inject",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "*/1 0 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1610,
+        "y": 520,
+        "wires": [
+            [
+                "b784afd09b6f85f5"
+            ]
+        ]
+    },
+    {
+        "id": "b784afd09b6f85f5",
+        "type": "change",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "savedData",
+                "pt": "flow",
+                "to": "[]",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1810,
+        "y": 520,
+        "wires": [
+            [
+                "ee0a7b3a0171df0d"
+            ]
+        ]
+    },
+    {
+        "id": "ee27c78bf4b2647a",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Send_Alerts_dashboard",
+        "func": "\n\nvar alerta=\"\";\n\n\nvalor_HR= msg.payload;\n\ndate = new Date();\ndate = (date.getFullYear() + '-' + ('00' + (date.getMonth()+1)).slice(-2) + '-' + ('00' + date.getDate()).slice(-2) + ' ' + ('00' + date.getHours()).slice(-2) + ':' + ('00' + date.getMinutes()).slice(-2) + ':' + ('00' + date.getSeconds()).slice(-2));\n\nif (msg.alarm == \"1\"){\n    alerta = \"Heart Rate Alerta \";\n    \n   \n}\n\nif (msg.alarm ==\"0\" || msg.alarm ==\"3\"){\n    alerta = \" Heart Rate Controlado\" ;\n   \n   \n}\n\nif ( msg.alarm == \"2\"){\n    alerta =  \"Heart Rate Alerta\" ;\n    \n    \n}\n\n\nif (msg.alarm ==\"4\"){\n    alerta =  \"Heart Rate Nulo\";\n   \n}\n\nif (msg.alarm ==\"6\"){\n    alerta =  \"Heart Rate elevado\" ;\n   \n  \n}\n\nif (msg.alarm ==\"7\"){\n    alerta =  \"Heart Rate baixo\" ;\n    \n    \n}\n\nif (msg.alarm == \"5\"){\n     alerta =  \"Atividade fisica\";\n    \n}\n\nif (msg.alarm == \"8\"){\n    alerta = \"Alerta Atividade fisica Heart Rate elevado \" ;\n    \n}\n\n\nif (msg.alarm == \"9\"){\n    alerta = \"Alerta Variacao de Heart Rate \" ;\n    \n}\n\n    \n    tableData = flow.get(\"savedData\") || [];\n    tableData.unshift({\n        \"Time\": date,\n        \"Alerta\": alerta,\n        \"Descricao/Valor_HR \": valor_HR\n    });\n    \nmsg.payload= tableData;\nflow.set(\"savedData\", tableData);\nreturn msg;\n\n\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1730,
+        "y": 460,
+        "wires": [
+            [
+                "7be2a6e31648058b"
+            ]
+        ]
+    },
+    {
+        "id": "7be2a6e31648058b",
+        "type": "trigger",
+        "z": "583634d236bcd70f",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "-1",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 1950,
+        "y": 480,
+        "wires": [
+            [
+                "ee0a7b3a0171df0d"
+            ]
+        ]
+    },
+    {
+        "id": "aa8ab48777fc8ba3",
+        "type": "mongodb-aleph-out",
+        "z": "583634d236bcd70f",
+        "mongodb": "82f5d1d2dffa9989",
+        "name": "",
+        "collection": "Alertas_user1",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 1980,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4b388e52ecf36ccb",
+        "type": "function",
+        "z": "583634d236bcd70f",
+        "name": "Alertas_Database",
+        "func": "date = new Date();\ndate = (date.getFullYear() + '-' + ('00' + (date.getMonth()+1)).slice(-2) + '-' + ('00' + date.getDate()).slice(-2) + ' ' + ('00' + date.getHours()).slice(-2) + ':' + ('00' + date.getMinutes()).slice(-2) + ':' + ('00' + date.getSeconds()).slice(-2));\nvar valor_HR=msg.payload;\n\nif (msg.alarm == \"1\"){\n    \n    msg.topic=\"Heart Rate Alerta\";\n    msg.payload={Time: date, Descricao: valor_HR};    \n}\n\nif (msg.alarm ==\"0\" || msg.alarm ==\"3\"){\n    \n   msg.topic=\"Heart Rate Controlado\";\n   msg.payload={Time: date, Descricao: valor_HR};  \n    \n}\n\nif ( msg.alarm == \"2\"){\n   \n    msg.topic=\"Heart Rate Alerta\";\n    msg.payload={Time: date, Descricao: valor_HR};    \n}\n\n\nif (msg.alarm == \"4\"){\n   \n    msg.topic=\"Heart Rate Nulo\";\n    msg.payload={Time: date, Descricao: valor_HR}; \n}\n\nif (msg.alarm ==\"6\"){\n    \n    msg.topic={Time: date,  Descricao:  valor_HR}; \n}\n\nif (msg.alarm ==\"7\"){\n    \n    msg.topic=\"Heart Rate baixo\";\n    msg.payload={Time: date, Descricao: valor_HR}; \n}\n\nif (msg.alarm == \"5\"){\n    \n    msg.topic=\"Atividade fisica \";\n    msg.payload={Time: date, Descricao: valor_HR}; \n}\n\nif (msg.alarm == \"8\"){\n   \n    msg.topic=\"Alerta Atividade fisica Heart Rate elevado \";\n    msg.payload={Time: date, Descricao: valor_HR}; \n}\n\n\nif (msg.alarm == \"9\"){\n    \n    msg.topic=\"Alerta Variacao de Heart Rate \";\n    msg.payload={Time: date, Descricao: valor_HR}; \n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1710,
+        "y": 420,
+        "wires": [
+            [
+                "aa8ab48777fc8ba3"
+            ]
+        ]
+    },
+    {
+        "id": "92754648d22eb47c",
+        "type": "ui_spacer",
+        "z": "583634d236bcd70f",
+        "name": "spacer",
+        "group": "b920dd4ec37a2059",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "28605068e77347ce",
+        "type": "ui_spacer",
+        "z": "583634d236bcd70f",
+        "name": "spacer",
+        "group": "01c929cb9bae062b",
+        "order": 2,
+        "width": 5,
+        "height": 1
+    },
+    {
+        "id": "4bf6854a2dd377cc",
+        "type": "mqtt-broker",
+        "name": "HiveMQ Cloud",
+        "broker": "0568b8867dd7492986fd891e32d423d1.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "0d6d9f17d1a524b1",
+        "clientid": "mytest",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "82f5d1d2dffa9989",
+        "type": "mongodb-aleph-config",
+        "hostname": "tese.ohi4c.mongodb.net",
+        "topology": "dnscluster",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "Sistema_Saude",
+        "name": "myMongoDB_send"
+    },
+    {
+        "id": "3d7aea3d75251625",
+        "type": "ui_group",
+        "name": "Fat_Burned",
+        "tab": "bbfe98797d050992",
+        "order": 7,
+        "disp": true,
+        "width": 3,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5da384986f9b6bcd",
+        "type": "ui_group",
+        "name": "Distance",
+        "tab": "bbfe98797d050992",
+        "order": 5,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7e68e2e4e786f50f",
+        "type": "ui_group",
+        "name": "Heart_Rate",
+        "tab": "bbfe98797d050992",
+        "order": 2,
+        "disp": true,
+        "width": 10,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ae48ff1fefa62809",
+        "type": "ui_group",
+        "name": "Calories",
+        "tab": "bbfe98797d050992",
+        "order": 8,
+        "disp": true,
+        "width": 3,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d7f40dd86bc922f2",
+        "type": "ui_group",
+        "name": "Alertas",
+        "tab": "bbfe98797d050992",
+        "order": 4,
+        "disp": true,
+        "width": 9,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "05fc8dde70e5789c",
+        "type": "ui_group",
+        "name": "User_Details",
+        "tab": "bbfe98797d050992",
+        "order": 1,
+        "disp": true,
+        "width": 9,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "01c929cb9bae062b",
+        "type": "ui_group",
+        "name": "Steps",
+        "tab": "bbfe98797d050992",
+        "order": 3,
+        "disp": true,
+        "width": 8,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "63183f11e233fce2",
+        "type": "ui_group",
+        "name": "Average_Velocity",
+        "tab": "bbfe98797d050992",
+        "order": 6,
+        "disp": true,
+        "width": 9,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9948bbaa5cdd5ae2",
+        "type": "persist-store",
+        "filename": "/home/pi/.node-red.persistance.json",
+        "interval": "60"
+    },
+    {
+        "id": "26b577844dcaa05e",
+        "type": "ui_group",
+        "name": "Alertas_table",
+        "tab": "59c593594a26c386",
+        "order": 1,
+        "disp": true,
+        "width": 30,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0d6d9f17d1a524b1",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "0568b8867dd7492986fd891e32d423d1.s1.eu.hivemq.cloud",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "bbfe98797d050992",
+        "type": "ui_tab",
+        "name": "Biometric_Data",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "59c593594a26c386",
+        "type": "ui_tab",
+        "name": "Alerts",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    }
+]
